@@ -1,0 +1,9 @@
+To do in Phone silencer App-
+
+user input for time
+list of times for schedule
+shared preferences / database for storage
+unsilent option for unsilencing and other modes
+periodic mode
+
+it takes trigger time in  milli seconds
