@@ -17,10 +17,15 @@ public class ReminderBroadcast extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notify").setSmallIcon(R.drawable.launch_background).setContentTitle("Reminder").setContentText("This is a reminder").setPriority(NotificationCompat.PRIORITY_DEFAULT);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(200, builder.build());
-        System.out.print("REACHED ON RECEIVE");
 
-        Toast.makeText(c, "SILENCED!", Toast.LENGTH_SHORT).show();//made a toast
         myAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        myAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+        int currentMode = myAudioManager.getRingerMode();
+
+        if(currentMode == AudioManager.RINGER_MODE_NORMAL){
+            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+            Toast.makeText(c, "SILENCED!", Toast.LENGTH_SHORT).show();//made a toast
+        }
+        else{
+            Toast.makeText(c, "ALREADY SILENT", Toast.LENGTH_SHORT).show();}//made a toast
     }
 }

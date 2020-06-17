@@ -46,12 +46,12 @@ public class MainActivity extends FlutterActivity {
           PendingIntent pendingIntent=PendingIntent.getBroadcast(MainActivity.this,0,intent,0);
 
           AlarmManager alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
-          long timeAtButtonClick=System.currentTimeMillis();
-          long time= (long)((int)args.get("from"))*1000;
+//          long timeAtButtonClick=System.currentTimeMillis();
 
-          alarmManager.set(AlarmManager.RTC_WAKEUP,timeAtButtonClick+time,pendingIntent);
+         long time =  Long.parseLong((String) args.get("from"));
+         alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
 
-          result.success("Current time is "+timeAtButtonClick);
+         result.success("Alarm successfully set");
         }
       }
     });

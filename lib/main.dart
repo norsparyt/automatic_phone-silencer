@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
-import 'package:day_night_time_picker/day_night_time_picker.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 
 void main() {
   runApp(new MaterialApp(
@@ -16,8 +16,9 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   static const platform = const MethodChannel('com.audio');
-  var sendMap = <String, dynamic>{"from": 10};
-  String text = "Set a timer";
+  static int triggerTime;
+  var sendMap = <String, dynamic>{"from": "10"};
+  String txt = "Set a timer";
 
   Future<String> _getMessage() async {
     String value;
@@ -29,18 +30,8 @@ class _HomeState extends State<Home> {
     return value;
   }
 
-  TimeOfDay _time = TimeOfDay.now();
-  void onTimeChanged(TimeOfDay newTime) {
-    setState(() {
-      _time = newTime;
-    });
-    int t= DateTime.now().millisecondsSinceEpoch;
-    print(t);
-    print(_time.hour);
-    print(_time.minute);
-    print(_time.hourOfPeriod);
-    print((_time.hour*60*60+_time.minute*60)*1000);
-  }
+  int flag = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,32 +39,35 @@ class _HomeState extends State<Home> {
       child: Center(
         child: Column(
           children: <Widget>[
-            Text(text),
-            MaterialButton(
-              color: Colors.black,
-              onPressed: () {
-              Navigator.of(context).push(
-                showPicker(
-                  context: context,
-                  value: _time,
-                  onChange: onTimeChanged,
-                ),
-              );
-            },
+            Text("set alarm for"),
+            TimePickerSpinner(
+              is24HourMode: false,
+              onTimeChange: (time) {
+                print(time);
+                print(time.millisecondsSinceEpoch);
+                triggerTime = time.millisecondsSinceEpoch;
+                sendMap.update("from", (value)=>triggerTime.toString());
+                setState(() {
+                  flag = 1;
+                });
+              },
             ),
             RaisedButton(
-                child: Text("Set for "+_time.toString()),
-                onPressed: () {
-              _getMessage().then((String message) {
-                print(message);
-                setState(() {
-                  text = message;
-                });
-              });
-            })
+                child: flag == 1 ? Text("Schedule Task") : Text("Enter time"),
+                onPressed: flag == 1 ? () => callNative() : null
+            )
           ],
         ),
       ),
     ));
+  }
+
+  void callNative() {
+    _getMessage().then((String message) {
+      print(message);
+      setState(() {
+        txt = message;
+      });
+    });
   }
 }
