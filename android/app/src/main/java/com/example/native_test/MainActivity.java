@@ -33,25 +33,39 @@ public class MainActivity extends FlutterActivity {
     new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(),CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
       @Override
       public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+        Context context = getApplicationContext();
         final Map<String,Object> args=call.arguments();//data received
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !notificationManager.isNotificationPolicyAccessGranted()) {
+          Intent intent = new Intent(
+                  android.provider.Settings
+                          .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+          startActivity(intent);
+        }//asking for DND permissions
 
         createNotificationChannel();//called notification method
         if(call.method.equals("getMessage")){
           //This is executed on method Call
 
-          Context context = getApplicationContext();
+
           Toast.makeText(context, "Silencer Set!", Toast.LENGTH_SHORT).show();//made a toast
 
           Intent intent=new Intent(MainActivity.this,ReminderBroadcast.class);
-          PendingIntent pendingIntent=PendingIntent.getBroadcast(MainActivity.this,0,intent,0);
+          PendingIntent pendingIntentFrom=PendingIntent.getBroadcast(MainActivity.this,0,intent,0);
+          PendingIntent pendingIntentTo=PendingIntent.getBroadcast(MainActivity.this,1,intent,0);
 
           AlarmManager alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
-//          long timeAtButtonClick=System.currentTimeMillis();
 
-         long time =  Long.parseLong((String) args.get("from"));
-         alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+          long fromTime =  Long.parseLong((String) args.get("from"));
+          long toTime =  Long.parseLong((String) args.get("to"));
 
-         result.success("Alarm successfully set");
+          alarmManager.set(AlarmManager.RTC_WAKEUP, fromTime, pendingIntentFrom);
+          alarmManager.set(AlarmManager.RTC_WAKEUP, toTime, pendingIntentTo);
+
+          result.success("Alarm successfully set");
         }
       }
     });

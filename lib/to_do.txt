@@ -7,3 +7,6 @@ unsilent option for unsilencing and other modes
 periodic mode
 
 it takes trigger time in  milli seconds
+
+features:
+allow app scheduling in idle(doze) modes
