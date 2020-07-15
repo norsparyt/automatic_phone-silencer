@@ -3,6 +3,7 @@ Color primColor = Colors.grey.shade50;
 Color secColor =Colors.blueGrey.shade700;
 Color darkColor= Colors.grey.shade900;
 Color dynamicTypeColor;
+String toggles="";
 
 String getDateFormat(DateTime dateTime) {
   String weekday = "";

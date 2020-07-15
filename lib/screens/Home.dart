@@ -2,6 +2,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:native_test/data/database_helper.dart';
 import 'package:native_test/widgets/task.dart';
 import 'package:native_test/screens/newTask.dart';
 import '../data.dart';
@@ -27,7 +28,7 @@ class _HomeState extends State<Home> {
                   Icons.calendar_today,
                   size: 20,
                 ),
-                onPressed: null)
+                onPressed: printDb)
           ],
           backgroundColor: primColor,
         ),
@@ -192,5 +193,10 @@ return PageRouteBuilder(transitionDuration:Duration(seconds: 1),pageBuilder:(_,_
 //    child: child,
 //  );}
 //);
+  }
+  var db=new DatabaseHelper();
+  printDb() async {
+    List tasks=await db.getAllTasks();
+    print(tasks);
   }
 }

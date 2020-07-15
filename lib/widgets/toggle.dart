@@ -7,9 +7,13 @@ class Toggle extends StatefulWidget {
 }
 
 class _ToggleState extends State<Toggle> {
-  bool alarmSwitchState = false;
-  bool mediaSwitchState = false;
-  bool vibrationSwitchState = false;
+  bool alarmSwitch,mediaSwitch,vibrationSwitch ;
+  _ToggleState(){
+    alarmSwitch=false;
+    mediaSwitch=false;
+    vibrationSwitch=false;
+    toggles="FFF";
+  }
   @override
   Widget build(BuildContext context) {
     TextStyle sty = TextStyle(
@@ -33,14 +37,15 @@ class _ToggleState extends State<Toggle> {
                   activeColor: Colors.white,
                   activeThumbImage: AssetImage('lib/images/alarm-on.png'),
                   inactiveThumbImage: AssetImage('lib/images/alarm-off.png'),
-                  activeTrackColor: dynamicTypeColor,
+                  activeTrackColor: dynamicTypeColor==darkColor?Colors.blue.shade700:dynamicTypeColor,
                   inactiveThumbColor: Colors.white,
                   inactiveTrackColor: secColor,
-                  value: alarmSwitchState,
+                  value: alarmSwitch,
                   onChanged: (v) {
                     setState(() {
-                      alarmSwitchState = v;
-                      print("Alarm Switch:$alarmSwitchState");
+                      alarmSwitch = v;
+                      alarmSwitch==true?changeToggle(0,"T"):changeToggle(0,"F");
+                      print("Alarm Switch:$alarmSwitch");
                     });
                   })
             ],
@@ -56,14 +61,15 @@ class _ToggleState extends State<Toggle> {
                   activeColor: Colors.white,
                   activeThumbImage: AssetImage('lib/images/vibrate-on.png'),
                   inactiveThumbImage: AssetImage('lib/images/vibrate-off.png'),
-                  activeTrackColor: dynamicTypeColor,
+                  activeTrackColor: dynamicTypeColor==darkColor?Colors.blue.shade700:dynamicTypeColor,
                   inactiveThumbColor: Colors.white,
                   inactiveTrackColor: secColor,
-                  value: vibrationSwitchState,
+                  value: vibrationSwitch,
                   onChanged: (v) {
                     setState(() {
-                      vibrationSwitchState = v;
-                      print("Vibration Switch:$vibrationSwitchState");
+                      vibrationSwitch = v;
+                      vibrationSwitch==true?changeToggle(1,"T"):changeToggle(1,"F");
+                      print("Vibration Switch:$vibrationSwitch");
                     });
                   })
             ],
@@ -79,14 +85,15 @@ class _ToggleState extends State<Toggle> {
                   activeColor: Colors.white,
                   activeThumbImage: AssetImage('lib/images/media-on.png'),
                   inactiveThumbImage: AssetImage('lib/images/media-off.png'),
-                  activeTrackColor: dynamicTypeColor,
+                  activeTrackColor: dynamicTypeColor==darkColor?Colors.blue.shade700:dynamicTypeColor,
                   inactiveThumbColor: Colors.white,
                   inactiveTrackColor: secColor,
-                  value: mediaSwitchState,
+                  value: mediaSwitch,
                   onChanged: (v) {
                     setState(() {
-                      mediaSwitchState = v;
-                      print("Media Switch:$mediaSwitchState");
+                      mediaSwitch = v;
+                      mediaSwitch==true?changeToggle(2,"T"):changeToggle(2,"F");
+                      print("Media Switch:$mediaSwitch");
                     });
                   })
             ],
@@ -95,4 +102,8 @@ class _ToggleState extends State<Toggle> {
       ],
     );
   }
+void changeToggle(int index,String char){
+toggles=toggles.substring(0,index)+char+toggles.substring(index+1);
+print(toggles);
+}
 }

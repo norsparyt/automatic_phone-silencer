@@ -13,7 +13,8 @@ class DatabaseHelper {
   final String tableTask = "taskTable";
   final String columnId = "id";
   final String columnTitle = "title";
-  final String columnTime = "time";
+  final String columnStartTime = "startTime";
+  final String columnEndTime = "endTime";
   final String columnDate = "date";
   final String columnCategory = "category";
   final String columnToggle = "toggle";
@@ -41,15 +42,15 @@ class DatabaseHelper {
   }
 
   /*
-     id | title | time | date | category |toggle
+     id | title | startTime | endTime | date | category |toggle
      ------------------------
-     1  | Lecture    | 2019282321 | 1808244810 | "Classes" | 110
+     1  | Lecture    | 2019282321 | 1808244810 | 182327123 | "Classes" | 110
 
    */
 
   void _onCreate(Database db, int newVersion) async {
     await db.execute(
-        "CREATE TABLE $tableTask($columnId INTEGER, $columnTitle TEXT, $columnTime INTEGER,$columnDate INTEGER,$columnCategory TEXT,$columnToggle TEXT)");
+        "CREATE TABLE $tableTask($columnId INTEGER PRIMARY KEY AUTOINCREMENT, $columnTitle TEXT, $columnStartTime INTEGER, $columnEndTime INTEGER,$columnDate INTEGER,$columnCategory TEXT,$columnToggle TEXT)");
   }
 
   //CRUD - CREATE, READ, UPDATE , DELETE

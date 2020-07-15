@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:native_test/data/database_helper.dart';
+import 'package:native_test/models/task.dart';
 import 'package:native_test/widgets/toggle.dart';
 import '../data.dart';
 
@@ -13,29 +16,39 @@ class NewTask extends StatefulWidget {
 class _NewTaskState extends State<NewTask> with SingleTickerProviderStateMixin {
   AnimationController _introController;
   Animation<Offset> _slide;
-  Animation _radius, _fadeTop,_fadeBottom;
-TextEditingController _fromController,_toController,_dateController;
-  Widget dynamicIcon =Icon(Icons.add_circle,color: primColor,size: 30,);
-  DateTime _inputTime,_inputDate;
-  
-Color _gradientDark,_gradientLight;
+  Animation _radius, _fadeTop, _fadeBottom;
+  TextEditingController _titleController,
+      _fromController,
+      _toController,
+      _dateController;
+  Widget dynamicIcon = Icon(
+    Icons.create,
+    color: primColor,
+    size: 30,
+  );
+  DateTime _fromTime, _toTime, _inputDate;
+  var db = new DatabaseHelper();
+  String _title, _category, _error;
+  Color _gradientDark, _gradientLight;
+
   @override
   void initState() {
-    _gradientDark=Colors.blue.shade900;
-    _gradientLight=Colors.blue.shade400;
-    dynamicTypeColor=darkColor;
+    _gradientDark = Colors.blue.shade900;
+    _gradientLight = Colors.blue.shade400;
+    dynamicTypeColor = darkColor;
     super.initState();
-    _fromController=  TextEditingController();
-    _toController=  TextEditingController();
-    _dateController=  TextEditingController();
+    _titleController = TextEditingController();
+    _fromController = TextEditingController();
+    _toController = TextEditingController();
+    _dateController = TextEditingController();
     _introController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 1000))
           ..addListener(() {
             setState(() {});
           });
     _slide = Tween<Offset>(
-      begin: Offset(0.0,-1.0),
-      end:  Offset.zero,
+      begin: Offset(0.0, -1.0),
+      end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _introController,
       curve: Interval(0.0,0.4,curve:Curves.easeIn),
@@ -69,73 +82,82 @@ Color _gradientDark,_gradientLight;
     double deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              flex: 5,
-              child: SlideTransition(
-                position: _slide,
-                child: AnimatedContainer(
-                  duration:Duration(milliseconds: 500),
-                  decoration: BoxDecoration(
-                      color: dynamicTypeColor,
-                      borderRadius: BorderRadius.only(
-                          bottomRight: Radius.circular(_radius.value),
-                          bottomLeft: Radius.circular(_radius.value))),
-                  child: _fieldsTop(context),
-                ),
-              ),
-            ), //TOP CONTAINER
-            Expanded(
-              flex: 6,
-              child: Container(
-                color: primColor,
-                child: _fieldsBottom(context),
-              ),
-            ), //BOTTOM CONTAINER
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Hero(
-                  transitionOnUserGestures: true,
-                  tag: 'addButton',
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 500),
-                    width: deviceWidth,
-                    margin: EdgeInsets.only(top: 0.0, bottom: 0.0),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                        _gradientDark,
-                        _gradientLight,
-                      ], stops: [
-                        0.1,
-                        0.8
-                      ], begin: Alignment.bottomLeft, end: Alignment.topRight),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 3,
-                          blurRadius: 7,
-                        ),
-                      ],
-                      color: secColor,
+      body: Builder(
+        builder: (BuildContext context) {
+          return SafeArea(
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: SlideTransition(
+                    position: _slide,
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 500),
+                      decoration: BoxDecoration(
+                          color: dynamicTypeColor,
+                          borderRadius: BorderRadius.only(
+                              bottomRight: Radius.circular(_radius.value),
+                              bottomLeft: Radius.circular(_radius.value))),
+                      child: _fieldsTop(context),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Icon(
-                        Icons.add,
-                        color: primColor,
-                        size: 30,
+                  ),
+                ), //TOP CONTAINER
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                    color: primColor,
+                    child: _fieldsBottom(context),
+                  ),
+                ), //BOTTOM CONTAINER
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: GestureDetector(
+                    onTap: () {
+                      saveNewTask(context);
+                    },
+                    child: Hero(
+                      transitionOnUserGestures: true,
+                      tag: 'addButton',
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 500),
+                        width: deviceWidth,
+                        margin: EdgeInsets.only(top: 0.0, bottom: 0.0),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [
+                            _gradientDark,
+                            _gradientLight,
+                          ],
+                              stops: [
+                                0.1,
+                                0.8
+                              ],
+                              begin: Alignment.bottomLeft,
+                              end: Alignment.topRight),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 3,
+                              blurRadius: 7,
+                            ),
+                          ],
+                          color: secColor,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Icon(
+                            Icons.add,
+                            color: primColor,
+                            size: 30,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ), //ADD BUTTON
-          ],
-        ),
+                ), //ADD BUTTON
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -157,6 +179,7 @@ Color _gradientDark,_gradientLight;
               flex: 2,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Align(
                       alignment: Alignment.topLeft,
@@ -168,7 +191,7 @@ Color _gradientDark,_gradientLight;
                             fontWeight: FontWeight.w300),
                       )),
                   Container(
-                      margin: EdgeInsets.only(left: 10.0,bottom: 20.0),
+                      margin: EdgeInsets.only(left: 10.0, top: 5.0),
                       child: dynamicIcon),
                 ],
               ),
@@ -176,14 +199,16 @@ Color _gradientDark,_gradientLight;
             Expanded(
               flex: 2,
               child: TextField(
+                controller: _titleController,
                 maxLength: 30,
                 maxLengthEnforced: true,
-                onSubmitted: (title){
-                  //add to db here
+                onChanged: (title) {
+                  _title = title;
                 },
                 style: TextStyle(color: Colors.white),
                 cursorColor: primColor,
                 decoration: InputDecoration(
+//                  errorText: _errorTitle,
                     labelText: "TITLE", hintText: "eg.Meeting with Dave"),
               ),//TITLE
             ),
@@ -192,6 +217,7 @@ Color _gradientDark,_gradientLight;
         ),
       );
   }
+
 
   Widget _fieldsBottom(BuildContext context) {
     TextStyle labelStyle = TextStyle(
@@ -223,6 +249,7 @@ Color _gradientDark,_gradientLight;
                           readOnly: true,
                           showCursor: true,
                           decoration: InputDecoration(
+//                            errorText: _errorDate,
                             suffixIcon: Padding(
                               padding: const EdgeInsets.only(top: 20.0),
                               child: Icon(Icons.keyboard_arrow_down),
@@ -291,28 +318,36 @@ Color _gradientDark,_gradientLight;
   }
 Widget category(Color boxColor, Color textColor, String text, BuildContext context) {
   return GestureDetector(
-      onTap: () {
-        setDynamicIcon(text);
-        setState(() {
-          dynamicTypeColor=textColor;
-          _gradientLight=boxColor;
-          _gradientDark=textColor;
-        });
-        print("tapped:$text");},
-      child: Container(
-        height:MediaQuery.of(context).size.width * 0.08,
-        width: MediaQuery.of(context).size.width * 0.25,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(7.0),
-          color: boxColor,
-        ),
-        child: Text(
-          text,
-          style: TextStyle(color: textColor),
-        ),
+    onTap: () {
+      setDynamicIcon(text);
+      setState(() {
+        dynamicTypeColor = textColor;
+        _gradientLight = boxColor;
+        _gradientDark = textColor;
+      });
+      print("tapped:$text");
+      _category = text;
+    },
+    child: Container(
+      height: MediaQuery
+          .of(context)
+          .size
+          .width * 0.08,
+      width: MediaQuery
+          .of(context)
+          .size
+          .width * 0.25,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(7.0),
+        color: boxColor,
       ),
-    );
+      child: Text(
+        text,
+        style: TextStyle(color: textColor),
+      ),
+    ),
+  );
   }
 
   void setDynamicIcon(String t){
@@ -340,9 +375,11 @@ Widget category(Color boxColor, Color textColor, String text, BuildContext conte
               controller: _fromController,
               showCursor: true,
               readOnly: true,
-              onTap: () => _showDialog(context,1),
+              onTap: () => _showDialog(context, 1),
               cursorColor: primColor,
-              decoration: InputDecoration(labelText: "FROM"),
+              decoration: InputDecoration(
+//                  errorText:_errorFromTime,
+                  labelText: "FROM"),
             ),
           ),
           Icon(
@@ -356,11 +393,13 @@ Widget category(Color boxColor, Color textColor, String text, BuildContext conte
               controller: _toController,
               showCursor: true,
               onTap: () {
-                _showDialog(context,2);
+                _showDialog(context, 2);
               },
               readOnly: true,
               cursorColor: primColor,
-              decoration: InputDecoration(labelText: "TO"),
+              decoration: InputDecoration(
+//                  errorText:_errorToTime,
+                  labelText: "TO"),
             ),
           ),
         ],
@@ -368,8 +407,10 @@ Widget category(Color boxColor, Color textColor, String text, BuildContext conte
     );
   }
 
-  void _showDialog(BuildContext context,int index) {
+  int _id = 1;
+  bool checked = false;
 
+  void _showDialog(BuildContext context, int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -386,8 +427,11 @@ Widget category(Color boxColor, Color textColor, String text, BuildContext conte
                     flex: 8,
                     child: TimePickerSpinner(
                       is24HourMode: false,
-                      onTimeChange: (time){
-                        _inputTime=time;
+                      onTimeChange: (time) {
+                        if (index == 1)
+                          _fromTime = time;
+                        if (index == 2)
+                          _toTime = time;
                       },
                     ),
                   ),
@@ -403,11 +447,14 @@ Widget category(Color boxColor, Color textColor, String text, BuildContext conte
                               bottomRight: Radius.circular(20.0))),
                       minWidth: double.maxFinite,
                       child: Icon(Icons.check),
-                      onPressed: ()  {
-                        if(index==1)_fromController.text="${_inputTime.hour}: ${_inputTime.minute}";
-                        else if(index==2)_toController.text="${_inputTime.hour}: ${_inputTime.minute}";
+                      onPressed: () {
+                        if (index == 1)
+                          _fromController.text =
+                          "${_fromTime.hour}: ${_fromTime.minute}";
+                        else if (index == 2) _toController.text =
+                        "${_toTime.hour}: ${_toTime.minute}";
                         Navigator.of(context).pop();
-                        },
+                      },
                     ),
                   )
                 ],
@@ -415,5 +462,74 @@ Widget category(Color boxColor, Color textColor, String text, BuildContext conte
             ));
       },
     );
+  }
+
+  Future<void> saveNewTask(BuildContext context) async {
+    validations(context);
+    if (checked == true) {
+      await db.saveTask(Task(
+          _title,
+          _fromTime.millisecondsSinceEpoch,
+          _toTime.millisecondsSinceEpoch,
+          _inputDate.millisecondsSinceEpoch,
+          _category,
+          toggles));
+      print("saved");
+      Navigator.of(context).pop();
+    }
+    int count = await db.getCount();
+    print(count);
+  }
+
+  void validations(BuildContext context) {
+    if (_titleController.text.length < 3) {
+      _error = "Title too small";
+      showSnackBar(context);
+    }
+    else if (_titleController.text.length > 30) {
+      _error = "Title too large";
+      showSnackBar(context);
+    }
+    else if (_fromTime == null) {
+      _error = "Choose a start time";
+      showSnackBar(context);
+    }
+    else if (_toTime == null) {
+      _error = "Choose an end time";
+      showSnackBar(context);
+    }
+    else if (_inputDate == null) {
+      _error = "Select a date";
+      showSnackBar(context);
+    }
+    else if (_category == null) {
+      _error = "A Category must be selected";
+      showSnackBar(context);
+    }
+    else {
+//      print("title:$_title ,from: $_fromTime,to: $_toTime, date: $_inputDate ,state:$toggles,category:$_category}");
+      _error = "Saved this task";
+      showSnackBar(context);
+      checked = true;
+    }
+  }
+
+  void showSnackBar(BuildContext context) {
+    final snackBar = SnackBar(content:
+    Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(_error, style: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.w300, letterSpacing: 5.0),),
+          Icon(Icons.announcement),
+        ],
+      ),
+      height: 33,
+    ),
+      backgroundColor: darkColor,
+      elevation: 2,
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 }
