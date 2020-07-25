@@ -1,31 +1,44 @@
 import 'package:flutter/material.dart';
-import '../data.dart';
+import 'package:native_test/models/task_model.dart';
+import 'package:provider/provider.dart';
 
 class Toggle extends StatefulWidget {
+  String category;
+
+  Toggle(this.category);
+
   @override
   _ToggleState createState() => _ToggleState();
 }
 
 class _ToggleState extends State<Toggle> {
-  bool alarmSwitch,mediaSwitch,vibrationSwitch ;
-  _ToggleState(){
-    alarmSwitch=false;
-    mediaSwitch=false;
-    vibrationSwitch=false;
-    toggles="FFF";
+  String toggles;
+  bool alarmSwitch, mediaSwitch, vibrationSwitch;
+
+  var prov;
+
+  @override
+  void initState() {
+    super.initState();
+    alarmSwitch = false;
+    mediaSwitch = false;
+    vibrationSwitch = false;
+    prov = Provider.of<TaskModel>(context, listen: false);
+    toggles = prov.toggles;
   }
+
   @override
   Widget build(BuildContext context) {
-    TextStyle sty = TextStyle(
+    TextStyle sty = Theme.of(context).textTheme.display1.copyWith(
         fontSize: 14,
-        color: darkColor,
+        color: Theme.of(context).primaryColorDark,
         letterSpacing: 2,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w500,
         wordSpacing: 2);
     return Column(
       children: <Widget>[
-        Expanded(
-          flex: 0,
+        Container(
+          height: 40,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -37,22 +50,29 @@ class _ToggleState extends State<Toggle> {
                   activeColor: Colors.white,
                   activeThumbImage: AssetImage('lib/images/alarm-on.png'),
                   inactiveThumbImage: AssetImage('lib/images/alarm-off.png'),
-                  activeTrackColor: dynamicTypeColor==darkColor?Colors.blue.shade700:dynamicTypeColor,
+                  activeTrackColor: widget.category == null ? Colors.lightBlue
+                      .shade500 : Provider
+                      .of<TaskModel>(context, listen: true)
+                      .colors[0],
                   inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: secColor,
+                  inactiveTrackColor: Theme
+                      .of(context)
+                      .primaryColorDark,
                   value: alarmSwitch,
                   onChanged: (v) {
                     setState(() {
                       alarmSwitch = v;
-                      alarmSwitch==true?changeToggle(0,"T"):changeToggle(0,"F");
+                      alarmSwitch == true ? changeToggle(0, "T") : changeToggle(
+                          0, "F");
                       print("Alarm Switch:$alarmSwitch");
                     });
                   })
             ],
           ),
         ), //ALARM TOGGLE
-        Expanded(
-          flex: 0,
+
+        Container(
+          height: 40,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -61,22 +81,30 @@ class _ToggleState extends State<Toggle> {
                   activeColor: Colors.white,
                   activeThumbImage: AssetImage('lib/images/vibrate-on.png'),
                   inactiveThumbImage: AssetImage('lib/images/vibrate-off.png'),
-                  activeTrackColor: dynamicTypeColor==darkColor?Colors.blue.shade700:dynamicTypeColor,
+                  activeTrackColor: widget.category == null ? Colors.lightBlue
+                      .shade500 : Provider
+                      .of<TaskModel>(context, listen: true)
+                      .colors[0],
                   inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: secColor,
+                  inactiveTrackColor: Theme
+                      .of(context)
+                      .primaryColorDark,
                   value: vibrationSwitch,
                   onChanged: (v) {
                     setState(() {
                       vibrationSwitch = v;
-                      vibrationSwitch==true?changeToggle(1,"T"):changeToggle(1,"F");
+                      vibrationSwitch == true
+                          ? changeToggle(1, "T")
+                          : changeToggle(1, "F");
                       print("Vibration Switch:$vibrationSwitch");
                     });
                   })
             ],
           ),
         ), //VIBRATION TOGGLE
-        Expanded(
-          flex: 0,
+
+        Container(
+          height: 40,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -85,14 +113,20 @@ class _ToggleState extends State<Toggle> {
                   activeColor: Colors.white,
                   activeThumbImage: AssetImage('lib/images/media-on.png'),
                   inactiveThumbImage: AssetImage('lib/images/media-off.png'),
-                  activeTrackColor: dynamicTypeColor==darkColor?Colors.blue.shade700:dynamicTypeColor,
+                  activeTrackColor: widget.category == null ? Colors.lightBlue
+                      .shade500 : Provider
+                      .of<TaskModel>(context, listen: true)
+                      .colors[0],
                   inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: secColor,
+                  inactiveTrackColor: Theme
+                      .of(context)
+                      .primaryColorDark,
                   value: mediaSwitch,
                   onChanged: (v) {
                     setState(() {
                       mediaSwitch = v;
-                      mediaSwitch==true?changeToggle(2,"T"):changeToggle(2,"F");
+                      mediaSwitch == true ? changeToggle(2, "T") : changeToggle(
+                          2, "F");
                       print("Media Switch:$mediaSwitch");
                     });
                   })
@@ -103,7 +137,7 @@ class _ToggleState extends State<Toggle> {
     );
   }
 void changeToggle(int index,String char){
-toggles=toggles.substring(0,index)+char+toggles.substring(index+1);
-print(toggles);
+  toggles = toggles.substring(0, index) + char + toggles.substring(index + 1);
+  prov.setToggle(toggles);
 }
 }

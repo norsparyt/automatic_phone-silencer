@@ -78,26 +78,27 @@
 //  }
 //}
 import 'package:flutter/material.dart';
+import 'package:native_test/models/task_model.dart';
+import 'package:provider/provider.dart';
+import 'data/theme_data.dart';
 import 'screens/Home.dart';
 
 void main() {
-  runApp(new MaterialApp(
-    theme: ThemeData(
-        inputDecorationTheme: InputDecorationTheme(
-          alignLabelWithHint: true,
-          labelStyle: TextStyle(color: Colors.grey.shade300,fontSize: 12.0,fontWeight: FontWeight.w300),
-          hintStyle: TextStyle(color: Colors.grey.shade400,fontSize: 10.0),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-        )
-    ),
-    title: "Psa",
-    home: Home(),
-    locale: Locale('en', 'US'),
-    supportedLocales: [
-      const Locale('en', 'US'), // English
-    ],
-    debugShowCheckedModeBanner: false,
-  ));
+  AppTheme appTheme = AppTheme();
+  runApp(
+      ChangeNotifierProvider(
+        create: (BuildContext context) => TaskModel(),
+        child: new MaterialApp(
+          theme: appTheme.themeData,
+          title: "Psa",
+          home: Home(),
+          locale: Locale('en', 'US'),
+          supportedLocales: [
+            const Locale('en', 'US'), // English
+          ],
+          debugShowCheckedModeBanner: false,
+        ),
+      ));
+  // ToDo:
+//   design task card
 }

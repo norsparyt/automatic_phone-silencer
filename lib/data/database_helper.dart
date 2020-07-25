@@ -85,11 +85,11 @@ class DatabaseHelper {
     return new Task.fromMap(result.first);
   }
 
-  Future<int> deleteTask(int id) async {
+  Future<int> deleteTask(String title) async {
     var dbClient = await db;
 
     return await dbClient
-        .delete(tableTask, where: "$columnId = ?", whereArgs: [id]);
+        .delete(tableTask, where: "$columnTitle = ?", whereArgs: [title]);
   }
 
   Future<int> updateTask(Task task) async {
