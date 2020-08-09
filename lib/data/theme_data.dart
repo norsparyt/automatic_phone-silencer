@@ -6,8 +6,16 @@ class AppTheme{
     ThemeData _theme=ThemeData(
       primaryColorLight: Colors.grey.shade50,
         primaryColorDark: Colors.grey.shade900,
+        secondaryHeaderColor: Colors.grey.shade700,
         textTheme: TextTheme(
-          display1: TextStyle(fontFamily: 'Quicksand',color: Colors.grey.shade50)
+          headline: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 40,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2),
+          display1: TextStyle(fontFamily: 'Quicksand',color: Colors.grey.shade50),
+          button: TextStyle(fontFamily: 'Quicksand',fontSize: 20.0),
+            display2: TextStyle(fontFamily: 'Quicksand',fontSize: 15.0,color: Colors.grey.shade800)
         ),
         inputDecorationTheme: InputDecorationTheme(
           alignLabelWithHint: true,

@@ -1,14 +1,17 @@
+import 'dart:async';
 import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:native_test/data/get_date_formatted.dart';
+import 'package:flutter/services.dart';
 import 'package:native_test/models/task_model.dart';
 import 'package:native_test/widgets/build_swiper.dart';
 import 'package:native_test/widgets/drawer_widget.dart';
 import 'package:native_test/widgets/new_task_button.dart';
 import 'package:native_test/screens/newTask.dart';
 import 'package:provider/provider.dart';
+
+import 'dynamic_home_top.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -18,192 +21,150 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   var prov;
   Color _primColor;
-  String _greeting;
-bool change=false;
+  static const platform = const MethodChannel('com.audio');
+  var sentData = [];
+
+  Future<String> _getMessage() async {
+    String value;
+    try {
+      value = await platform.invokeMethod('getMessage',sentData);
+    } catch (e) {
+      print(e);
+    }
+    return value;
+  }
+    void callNative() {
+    print("Called native");
+    _getMessage().then((String message) {
+      print("NATIVE SAYS: $message");});
+  }
   @override
   void initState() {
     super.initState();
     prov = Provider.of<TaskModel>(context, listen: false);
     if (prov.taskListInitialised == false) prov.initTaskList();
-    setGreeting();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Color c=Provider.of<TaskModel>(context,listen: true).homeColor;
+    Color c = Provider.of<TaskModel>(context, listen: true).homeColor;
     setState(() {
-      _primColor=c;
+      _primColor = c;
     });
-//    print("called");
   }
 
   @override
   Widget build(BuildContext context) {
-//    ThemeData theme = Theme.of(context);
-    double deviceHeight = MediaQuery.of(context).size.height;
-    double deviceWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        drawer: DrawerWidget(),
-        body: Builder(builder: (BuildContext context) {
-
-          return SafeArea(
-            child: Consumer<TaskModel>(
-              builder: (BuildContext context, value, Widget child) {
-                return AnimatedContainer(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: value.colors, stops: [
-                      0.3,
-                      0.9,
-                    ], begin: Alignment.bottomLeft, end: Alignment.topRight),
-                  ),
-                  duration: Duration(milliseconds: 500),
-                  child: child
-                );
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          IconButton(
-                              icon: Icon(
-                                Icons.menu,
-                                color:_primColor
-                                ,
-                              ),
-                              onPressed: () {
-                                Scaffold.of(context).openDrawer();
-                              }),
-                          IconButton(
-                              icon: Icon(Icons.calendar_today,
-                                  color: _primColor
-                              ),
-                              onPressed: null),
-                        ],
+    return WillPopScope(
+      onWillPop: _onBackPressed,
+      child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          drawer: DrawerWidget(),
+          body: SafeArea(
+              child: Consumer<TaskModel>(
+                builder: (BuildContext context, value, Widget child) {
+                  return AnimatedContainer(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: value.colors,
+                            stops: [
+                              0.3,
+                              0.9,
+                            ],
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Container(
-                      color: Colors.transparent,
-                      margin: EdgeInsets.only(
-                          right: deviceWidth * 0.11,
-                          left: deviceWidth * 0.1,
-                          top: deviceWidth * 0.02),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              " $_greeting\n Dave",
-                              style: TextStyle(
-                                fontFamily: 'Quicksand',
-                                  color: _primColor
-                                  ,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.2),
-                            ),
-                          ),
-                          CircleAvatar(
-                            backgroundImage:
-                            Image.asset("lib/images/Chris-user-profile.jpg")
-                                .image,
-                            radius: 35,
-                          )
-                        ],
-                      ),
-                    ),
-                  ), //Time+Name
-                  Expanded(
-                    flex: 3,
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.only(
-                          left: deviceWidth * 0.13, top: 0.0),
-                      child: Text(Provider.of<TaskModel>(context,listen: true).introLine,
-                        style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: 17,
-                            height: 1.5,
-                            fontWeight: FontWeight.w400,
-                            color: _primColor
-                        ),
-                      ),
-                    ),
-                  ), //details
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      margin: EdgeInsets.only(left: deviceWidth * 0.14),
-                      child: Text(
-                        GetDateFormatted()
-                            .getDateFormat(DateTime.now())
-                            .toUpperCase(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                            fontFamily: 'Quicksand',
-                            color:  _primColor,
-                            fontSize: 15),
-                      ),
-                    ),
-                  ), //today
-                  Expanded(
-                      flex: 8,
+                      duration: Duration(milliseconds: 500),
+                      child: child);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 9,
                       child: Container(
+                          child: DynamicHomeTop(_primColor)),
+                    ),
+                    Expanded(
+                        flex: 8,
+                        child: Container(
 //                        height: deviceHeight * 0.47,
-                        child: BuildSwiper(),
-                      )), //Cards
-                  Expanded(
-                    flex: 2,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(context, _createRoute());
-                        },
-                        child: Hero(
-                          transitionOnUserGestures: true,
-                          tag: 'addButton',
-                          child: NewTaskButton(),
+                          child: BuildSwiper(),
+                        )), //Cards
+                    Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, _createRouteToAdd());
+                          },
+                          child: Hero(
+                            transitionOnUserGestures: true,
+                            tag: 'addButton',
+                            child: NewTaskButton(),
+                          ),
                         ),
                       ),
-                    ),
-                  ), //add button
-                ],
-              ),
-            )
-          );
-        }));
-//    )
+                    ), //add button
+                  ],
+                ),
+              ))
+
+      ),
+    );
   }
-void setGreeting()
-{
-  int now= DateTime.now().hour;
-  print(now);
-  if(now>=0&&now<=3)
-    _greeting="Night";
-  else if(now<12)
-    _greeting="Morning";
-  else if(now<=16)
-    _greeting="Afternoon";
-  else if(now<=20)
-    _greeting="Evening";
-  else if(now<=24)
-    _greeting="Night";
-}
-  Route _createRoute() {
+
+  Future<bool> _onBackPressed() {
+    List tempAllTasks=Provider.of<TaskModel>(context,listen: false).allTaskList;
+    return showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Are you sure?'),
+        content: new Text('Do you want to exit an App'),
+        actions: <Widget>[
+          new GestureDetector(
+            onTap: () => Navigator.of(context).pop(false),
+            child: Text("NO"),
+          ),
+          SizedBox(height: 16),
+          new GestureDetector(
+            onTap: () {
+              if(tempAllTasks.length!=0){
+              sentData=tempAllTasks;
+            }
+              callNative();
+//              Timer(Duration(seconds: 1), ()=>
+                  SystemNavigator.pop()
+//              )
+              ;
+              },
+            child: Text("YES"),
+          ),
+        ],
+      ),
+    ) ?? false;
+  }
+
+  Route _createRouteToAdd() {
     return PageRouteBuilder(
-        transitionDuration: Duration(seconds: 1),
-        pageBuilder: (_, __, ___) => NewTask());
+        transitionDuration: Duration(milliseconds: 500),
+        pageBuilder: (context, animation, secondaryAnimation) => NewTask(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var tween = Tween(begin: Offset(0.0, -1.0), end: Offset.zero);
+          var curvedAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.ease,
+          );
+          return SlideTransition(
+            position: tween.animate(curvedAnimation),
+            child: child,
+          );
+        });
+//    return PageRouteBuilder(
+//        transitionDuration: Duration(seconds: 1),
+//        pageBuilder: (_, __, ___) => NewTask());
 // PageRouteBuilder(
 //  pageBuilder: (context,animation,secondaryAnimation)=>NewTask(),
 //  transitionsBuilder: (context,animation,secondaryAnimation,child){

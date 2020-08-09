@@ -11,17 +11,17 @@ class DrawerWidget extends StatelessWidget {
                 topRight: Radius.circular(20.0),
                 bottomRight: Radius.circular(20.0))),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            tab("Profile", Icon(Icons.person,)),
+            tab("Active", Icons.alarm_on),
             Divider(
               color: Colors.grey.shade800,
             ),
-            tab("Settings", Icon(Icons.settings)),
+            tab("Settings", Icons.settings),
             Divider(
               color: Colors.grey.shade800,
             ),
-            tab("About", Icon(Icons.info))
+            tab("About", Icons.info_outline)
           ],
         ),
         height: MediaQuery.of(context).size.height,

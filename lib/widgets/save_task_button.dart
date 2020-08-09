@@ -21,7 +21,7 @@ class _AddButtonState extends State<AddButton> {
       child: AnimatedContainer(
         duration: Duration(milliseconds: 500),
         width: MediaQuery.of(context).size.width*0.9,
-        margin: EdgeInsets.only(top: 0.0, bottom: 5.0),
+        margin: EdgeInsets.only(bottom: 10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(MediaQuery.of(context).size.width),
           gradient: LinearGradient(colors:

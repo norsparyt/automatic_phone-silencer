@@ -88,9 +88,12 @@ void main() {
   runApp(
       ChangeNotifierProvider(
         create: (BuildContext context) => TaskModel(),
-        child: new MaterialApp(
+        child: MaterialApp(
           theme: appTheme.themeData,
           title: "Psa",
+          builder: (context,child){
+            return ScrollConfiguration(behavior: MyBehavior(), child: child);
+          },
           home: Home(),
           locale: Locale('en', 'US'),
           supportedLocales: [
@@ -100,5 +103,16 @@ void main() {
         ),
       ));
   // ToDo:
-//   design task card
+//  when db has two tasks of the same name, all get removed at once
+//on hitting back button at home screen app should close
+//view all tasks?
+//clear all tasks
+//change time picker to avoid validation for before time case
+}
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
+  }
 }

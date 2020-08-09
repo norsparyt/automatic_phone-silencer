@@ -44,7 +44,7 @@ class DatabaseHelper {
   /*
      id | title | startTime | endTime | date | category |toggle
      ------------------------
-     1  | Lecture    | 2019282321 | 1808244810 | 182327123 | "Classes" | 110
+     1  | Lecture    | 2019282321 | 1808244810 | 182327123 | "Classes" | TTF
 
    */
 
