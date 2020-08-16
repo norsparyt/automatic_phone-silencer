@@ -55,8 +55,6 @@ public class MainActivity extends FlutterActivity {
         if(numberOfTasks!=0){
          //intent created using broadcast class only once and will be called for multiple pending intents
           Intent intent=new Intent(MainActivity.this,ReminderBroadcast.class);
-//          PendingIntent pendingIntentFrom=PendingIntent.getBroadcast(MainActivity.this,0,intent,0);
-//          PendingIntent pendingIntentTo=PendingIntent.getBroadcast(MainActivity.this,1,intent,0);
           //initialised alarm service
           AlarmManager alarmManager=(AlarmManager) getSystemService(ALARM_SERVICE);
 //          creating alarms and notifications from pending intents

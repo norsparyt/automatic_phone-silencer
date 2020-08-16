@@ -78,37 +78,49 @@
 //  }
 //}
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:native_test/models/task_model.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'data/theme_data.dart';
 import 'screens/Home.dart';
+import 'screens/login_screens/welcome_screen.dart';
 
 void main() {
-  AppTheme appTheme = AppTheme();
-  runApp(
-      ChangeNotifierProvider(
-        create: (BuildContext context) => TaskModel(),
-        child: MaterialApp(
-          theme: appTheme.themeData,
-          title: "Psa",
-          builder: (context,child){
-            return ScrollConfiguration(behavior: MyBehavior(), child: child);
-          },
-          home: Home(),
-          locale: Locale('en', 'US'),
-          supportedLocales: [
-            const Locale('en', 'US'), // English
-          ],
-          debugShowCheckedModeBanner: false,
-        ),
-      ));
-  // ToDo:
-//  when db has two tasks of the same name, all get removed at once
-//on hitting back button at home screen app should close
-//view all tasks?
-//clear all tasks
-//change time picker to avoid validation for before time case
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  WidgetsFlutterBinding.ensureInitialized();
+  checkUserLoggedIn().then((contains) {
+    AppTheme appTheme = AppTheme();
+    runApp(ChangeNotifierProvider(
+      create: (BuildContext context) => TaskModel(),
+      child: MaterialApp(
+        theme: appTheme.themeData,
+        title: "Psa",
+        builder: (context, child) {
+          return ScrollConfiguration(behavior: MyBehavior(), child: child);
+        },
+        home: contains ? Home() : WelcomeScreen(),
+        locale: Locale('en', 'US'),
+        supportedLocales: [
+          const Locale('en', 'US'), // English
+        ],
+        debugShowCheckedModeBanner: false,
+      ),
+    ));
+  });
 }
+
+Future<bool> checkUserLoggedIn() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool contains = prefs.containsKey('User');
+  return contains;
+}
+
 class MyBehavior extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
@@ -116,3 +128,10 @@ class MyBehavior extends ScrollBehavior {
     return child;
   }
 }
+// ToDo:
+//handle pop scope back from all tasks screen
+//change time picker definitely to remove previous times
+//set ringer volume for silence and ringer mode for vibrate
+//also search DND options: not working
+//arrow icon set in new task screen
+//png for android notification

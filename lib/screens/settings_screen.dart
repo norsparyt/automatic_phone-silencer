@@ -1,6 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:native_test/models/task_model.dart';
+import 'package:native_test/screens/login_screens/welcome_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -75,22 +79,21 @@ String themeMode="Light";
                     child: CircleAvatar(
                       radius: deviceHeight * 0.11,
                       backgroundColor: Theme.of(context).primaryColorLight,
-                      child: CircleAvatar(
-                        radius: deviceHeight * 0.1,
-                        backgroundImage: Image.asset(
-                          "lib/images/Chris-user-profile.jpg",
-                        ).image,
-                      ),
+                      child: userImage(),
                     ),
                   ),
                   //todo:change sign in icon accordingly
                   Container(
                       margin: EdgeInsets.only(top: deviceHeight * 0.24),
                       alignment: Alignment.center,
-                      child: Image.asset(
+                      child: Provider.of<TaskModel>(context).googleSignIn?Image.asset(
                         'lib/images/google_icon.png',
                         scale: 2,
-                      ))
+                      ):Padding(
+                        padding: const EdgeInsets.only(top:15.0),
+                        child: Icon(Icons.mail,color:Colors.black87,size: 30,),
+                      )
+                  )
                 ],
               ),
               //tiles
@@ -166,7 +169,19 @@ String themeMode="Light";
 //                  color: Colors.red,
                   child: RaisedButton(
                     child: Text('Logout',style: Theme.of(context).textTheme.button,),
-                    onPressed: (){},
+                    onPressed: () async {
+//                    googleSignIn.signOut();
+                    googleSignIn.isSignedIn().then((value){
+                      print("Signed in using google?$value");
+                      if(value)
+                        googleSignIn.signOut();
+                      else
+                        auth.signOut();
+                    });
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.clear();
+                      Navigator.push(context, PageRouteBuilder(pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) =>WelcomeScreen()));
+                    },
                     elevation: 4.0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                     color: Theme.of(context).primaryColorLight.withOpacity(0.9),
@@ -178,5 +193,26 @@ String themeMode="Light";
         ),
       ),
     );
+  }
+  Widget userImage() {
+    return FutureBuilder(
+      future: getImage(),
+      builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+        if((snapshot.hasData)&&(snapshot.data[1]!=""))
+          return CircleAvatar(
+            backgroundImage: Image.network(snapshot.data[1]).image,
+            radius: deviceHeight * 0.1,          );
+        else
+          return CircleAvatar(
+            backgroundImage: Image.asset('lib/images/user_image.png').image,
+            radius:deviceHeight * 0.1,
+          );
+      },
+    );
+  }
+  Future<List<String>> getImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> user=prefs.getStringList('User');
+    return user;
   }
 }

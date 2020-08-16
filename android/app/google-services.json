@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "393704596858",
+    "firebase_url": "https://phone-silencing-app-be43e.firebaseio.com",
+    "project_id": "phone-silencing-app-be43e",
+    "storage_bucket": "phone-silencing-app-be43e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:393704596858:android:eb2df72b998a015ffda2c3",
+        "android_client_info": {
+          "package_name": "com.example.native_test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "393704596858-6stjpvcancqfd4582injsavk5kvbg2cq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.native_test",
+            "certificate_hash": "cc046fc05a640df42dbfa7a9d0f9f9b1dcc03139"
+          }
+        },
+        {
+          "client_id": "393704596858-sucmosf7d8s6f0nfg3j7gf1opoc3ce24.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPlH3X4Qvee0Q-_ofkoY-VB_kUxV68mhc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "393704596858-sucmosf7d8s6f0nfg3j7gf1opoc3ce24.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

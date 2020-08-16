@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:native_test/data/get_date_formatted.dart';
@@ -6,6 +7,7 @@ import 'package:native_test/models/task_model.dart';
 import 'package:native_test/widgets/calendar_text.dart';
 import 'package:native_test/widgets/calendar_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DynamicHomeTop extends StatefulWidget {
   Color primColor;
@@ -104,20 +106,19 @@ class _DynamicHomeTopState extends State<DynamicHomeTop> {
               top: deviceWidth * 0.2),
           child: calenderMode
               ? CalendarText(widget.primColor)
-              : greetText(),
+              : FutureBuilder(
+                  future: greetText(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<Widget> snapshot) =>
+                          snapshot.hasData ? snapshot.data : Container(),
+                ),
         ),
         //Time+Name
         AnimatedAlign(
           curve: Curves.easeIn,
           alignment: calenderMode ? Alignment.topRight : Alignment(0.8, -0.35),
-          child: Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: CircleAvatar(
-              backgroundImage:
-                  Image.asset("lib/images/Chris-user-profile.jpg").image,
-              radius: calenderMode ? 20 : 35,
-            ),
-          ),
+          child:
+              Padding(padding: const EdgeInsets.all(14.0), child: userImage()),
           duration: Duration(milliseconds: 500),
         ),
         //ProfilePic
@@ -181,8 +182,9 @@ class _DynamicHomeTopState extends State<DynamicHomeTop> {
     );
   }
 
-
-  Widget greetText() {
+  Future<Widget> greetText() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getStringList('User')[0];
     return AnimatedOpacity(
       opacity: opacity1,
       duration: Duration(milliseconds: 300),
@@ -190,12 +192,43 @@ class _DynamicHomeTopState extends State<DynamicHomeTop> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(" $_greeting\n Dave",
+          Text(
+              " $_greeting\n ${username != null && username.isNotEmpty ? username.substring(0, username.indexOf(' ')) : "user"}",
               style: Theme.of(context).textTheme.headline.copyWith(
-                color: widget.primColor,
-              )),
+                    color: widget.primColor,
+                  )),
         ],
       ),
     );
+  }
+
+  Widget userImage() {
+    return FutureBuilder(
+      future: getImage(),
+      builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+        if ((snapshot.hasData) && (snapshot.data[1] != ""))
+          return CircleAvatar(
+            backgroundImage: Image.network(snapshot.data[1]).image,
+            radius: calenderMode ? 20 : 35,
+          );
+        else
+          return CircleAvatar(
+            backgroundColor: Theme.of(context).primaryColorLight,
+            child: Icon(
+              Icons.person,
+              size: calenderMode ? 20 : 35,
+              color: Theme.of(context).primaryColorDark,
+            ),
+//           backgroundImage: Image.asset('lib/images/user_image.png',).image,
+            radius: calenderMode ? 20 : 35,
+          );
+      },
+    );
+  }
+
+  Future<List<String>> getImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> user = prefs.getStringList('User');
+    return user;
   }
 }

@@ -18,8 +18,6 @@ class tab extends StatefulWidget {
 }
 
 class _tabState extends State<tab> {
-  String stateName='Active';
-  IconData stateIcon=Icons.alarm_on;
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -27,25 +25,21 @@ class _tabState extends State<tab> {
         onPressed: (){
           switch(widget.name)
           {
+            case 'All Tasks':goToAllTasksPage();break;
             case 'Settings': goToSettingsPage();break;
             case 'About': goToAboutPage();break;
-            default:toggleAppState();
           }
         },
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               RotatedBox(
                 quarterTurns: 1,
-                child: Text(
-                  widget.name=='Active'?stateName:widget.name,
+                child: Text(widget.name,
                   style: Theme.of(context).textTheme.button.copyWith(letterSpacing: 2,fontSize: 17.0),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(13),
-              ),
-              Icon(widget.icon==Icons.alarm_on?stateIcon:widget.icon,color: Provider.of<TaskModel>(context).currentList.length == 0
+              Icon(widget.icon,color: Provider.of<TaskModel>(context).currentList.length == 0
                   ? Colors.teal
                   : Provider.of<TaskModel>(context).colors[0],
           ),
@@ -70,7 +64,7 @@ class _tabState extends State<tab> {
           );
         }));
   }
-  void goToAboutPage(){
+  void goToAllTasksPage(){
     Navigator.push(context, PageRouteBuilder(
         transitionDuration: Duration(milliseconds: 500),
         pageBuilder: (context, animation, secondaryAnimation) => AllTasksScreen(),
@@ -86,11 +80,5 @@ class _tabState extends State<tab> {
           );
         }));
   }
-  toggleAppState(){
-    //todo: show a toast/snackbar for all tasks scheduled
-    setState(() {
-      stateName=(stateName=='Active')?'Disabled':'Active';
-      stateIcon=(stateIcon==Icons.alarm_on)?Icons.alarm_off:Icons.alarm_on;
-    });
-  }
+  void goToAboutPage() {}
 }

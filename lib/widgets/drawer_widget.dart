@@ -13,7 +13,7 @@ class DrawerWidget extends StatelessWidget {
         child: Column(
 //          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            tab("Active", Icons.alarm_on),
+            tab("All Tasks", Icons.format_list_bulleted),
             Divider(
               color: Colors.grey.shade800,
             ),

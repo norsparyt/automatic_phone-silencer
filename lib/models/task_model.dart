@@ -31,7 +31,12 @@ class TaskModel extends ChangeNotifier {
 
   DateTime inquiryDate = DateTime.now();
 
-  DateTime initialDateField=DateTime.now();
+  DateTime initialDateField = DateTime.now();
+
+  bool googleSignIn = false;
+
+  setGoogleSignIn(bool value) => googleSignIn = value;
+
   //self-explanatory
   void initTaskList() {
     //called inside initState of Home screen
@@ -40,12 +45,19 @@ class TaskModel extends ChangeNotifier {
     db.getAllTasks().then((list) {
       allTaskList = list;
       //storing tasks
-      for(int i=0;i<allTaskList.length;i++)
-        if (DateTime.fromMillisecondsSinceEpoch(allTaskList[i]['date']).difference(DateTime.now()).inMinutes < 0) {
+      for (int i = 0; i < allTaskList.length; i++)
+        if ((DateTime.fromMillisecondsSinceEpoch(allTaskList[i]['startTime'])
+                    .difference(DateTime.now())
+                    .inMinutes <
+                0) ||
+            (DateTime.fromMillisecondsSinceEpoch(allTaskList[i]['startTime'])
+                    .difference(DateTime.now())
+                    .inDays <
+                0)) {
           db.deleteTask(allTaskList[i]['title']);
           allTaskList.remove(allTaskList[i]);
         }
-        //clearing all tasks from previous dates from both database and allTaskList
+      //clearing all tasks from previous dates from both database and allTaskList
       taskListInitialised = true;
       print("Task list Initialised");
       //taskList is initialised
@@ -79,16 +91,18 @@ class TaskModel extends ChangeNotifier {
       setDynamicColor(currentList[0]['category']);
     }
     //setting the initial field Date in case user taps the add button for that date
-    initialDateField=currentDate;
+    initialDateField = currentDate;
     notifyListeners();
   }
 
   void addTaskToList(Task task) async {
-    Task newTask = Task(task.title, task.startTime, task.endTime, task.date, task.category, task.toggle);
+    Task newTask = Task(task.title, task.startTime, task.endTime, task.date,
+        task.category, task.toggle);
     //adding to all tasks list
     allTaskList.add(newTask.toMap());
     //checking if the task added is for today and then adding to current list
-    setCurrentListFromAllTaskList(DateTime.fromMillisecondsSinceEpoch(task.date));
+    setCurrentListFromAllTaskList(
+        DateTime.fromMillisecondsSinceEpoch(task.date));
     print("CURRENT LIST$currentList");
     //changing dynamic ui
     currentList = List.from(currentList.reversed);
@@ -103,6 +117,7 @@ class TaskModel extends ChangeNotifier {
     notifyListeners();
     //Todo: we to rebuild the current task list every time by calling the set function
   }
+
   void deleteTask(String title) async {
     //method to remove tasks from all 3 lists: database, allTasksList and conditionally currentList
     allTaskList.removeWhere((item) => item["title"] == title);
@@ -124,6 +139,14 @@ class TaskModel extends ChangeNotifier {
       setIntroLine(currentList.length);
     //changing dynamic ui for home screen elements
     notifyListeners();
+  }
+
+  void deleteAll() {
+    allTaskList.forEach((f) {
+      db.deleteTask(f['title']);
+    });
+    currentList.clear();
+    allTaskList.clear();
   }
 
   void setDynamicColor(String category) {
@@ -163,9 +186,10 @@ class TaskModel extends ChangeNotifier {
         break;
       default:
         introLine =
-        "Looks pretty packed.\nYou've got $taskLength tasks scheduled for today";
+            "Looks pretty packed.\nYou've got $taskLength tasks scheduled for today";
     }
   }
+
 //method to add tasks to all 3 lists: database, allTasksList and conditionally currentList
   void setHomeColor(Color color) {
     //sets home screen widget color: dark grey or white
@@ -178,5 +202,9 @@ class TaskModel extends ChangeNotifier {
     toggles = t;
     print(toggles);
     notifyListeners();
+  }
+
+  void reInitialise() {
+    taskListInitialised = false;
   }
 }

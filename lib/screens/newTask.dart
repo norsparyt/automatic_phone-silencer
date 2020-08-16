@@ -486,13 +486,23 @@ class _NewTaskState extends State<NewTask> with SingleTickerProviderStateMixin {
   }
 
   void validations(BuildContext context) {
+    bool exists=false;
+    List tempList=Provider.of<TaskModel>(context,listen:false).allTaskList;
+    tempList.forEach((f){
+      if(_titleController.text==f['title'])
+        exists=true;
+    });
     if (_titleController.text.length < 3) {
       _error = "Title too small";
       showSnackBar(context);
     } else if (_titleController.text.length > 30) {
       _error = "Title too large";
       showSnackBar(context);
-    } else if (_fromTime == null) {
+    } else if(exists){
+      _error="Same task title already exists";
+      showSnackBar(context);
+    }
+      else if (_fromTime == null) {
       _error = "Choose a start time";
       showSnackBar(context);
     } else if (_toTime == null) {
