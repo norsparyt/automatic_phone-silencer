@@ -8,12 +8,14 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:native_test/data/database_helper.dart';
 import 'package:native_test/data/get_date_formatted.dart';
 import 'package:native_test/data/get_dynamic_icon.dart';
+import 'package:native_test/data/time_to_24.dart';
 import 'package:native_test/models/task.dart';
 import 'package:native_test/models/task_model.dart';
 import 'package:native_test/screens/Home.dart';
 import 'package:native_test/widgets/save_task_button.dart';
 import 'package:native_test/widgets/toggle.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewTask extends StatefulWidget {
   @override
@@ -424,13 +426,15 @@ class _NewTaskState extends State<NewTask> with SingleTickerProviderStateMixin {
                               bottomRight: Radius.circular(20.0))),
                       minWidth: double.maxFinite,
                       child: Icon(Icons.check),
-                      onPressed: () {
+                      onPressed: () async {
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        int timeFormat=prefs.getInt('timeFormat');
                         if (index == 1)
-                          _fromController.text =
-                              "${_fromTime.hour}: ${_fromTime.minute}";
+                          _fromController.text =timeFormat==12?"${TimeTo24().convert(_fromTime)['hour']}:${_fromTime.minute} ${TimeTo24().convert(_fromTime)['timeOfDay']}"
+                              :"${_fromTime.hour}: ${_fromTime.minute}";
                         else if (index == 2)
-                          _toController.text =
-                              "${_toTime.hour}: ${_toTime.minute}";
+                          _toController.text =timeFormat==12?"${TimeTo24().convert(_toTime)['hour']}:${_toTime.minute} ${TimeTo24().convert(_toTime)['timeOfDay']}"
+                              :"${_toTime.hour}: ${_toTime.minute}";
                         Navigator.of(context).pop();
                       },
                     ),

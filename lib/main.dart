@@ -118,6 +118,8 @@ void main() {
 Future<bool> checkUserLoggedIn() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool contains = prefs.containsKey('User');
+  if(!contains)
+    prefs.setInt("timeFormat", 24);
   return contains;
 }
 
@@ -129,9 +131,7 @@ class MyBehavior extends ScrollBehavior {
   }
 }
 // ToDo:
-//handle pop scope back from all tasks screen
 //change time picker definitely to remove previous times
 //set ringer volume for silence and ringer mode for vibrate
-//also search DND options: not working
 //arrow icon set in new task screen
 //png for android notification

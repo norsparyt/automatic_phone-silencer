@@ -3,8 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:native_test/data/get_dynamic_icon.dart';
+import 'package:native_test/data/time_to_24.dart';
 import 'package:native_test/models/task_model.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BuildSwiper extends StatefulWidget {
 //builds swiper using Consumer
@@ -87,14 +89,21 @@ class _BuildSwiperState extends State<BuildSwiper> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
-                              getTime(
-                                  task.currentList[index]["startTime"], context),
+                              FutureBuilder(
+                                future: getTime(task.currentList[index]["startTime"], context),
+                                builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+                                  return snapshot.hasData?snapshot.data:Container();
+                                },),
                               Icon(
                                 Icons.repeat,
                                 size: 14,
                                 color: task.colors[0],
                               ),
-                              getTime(task.currentList[index]["endTime"], context),
+                              FutureBuilder(
+                                future: getTime(task.currentList[index]["endTime"], context),
+                                builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+                                  return snapshot.hasData?snapshot.data:Container();
+                                },),
                             ],
                           ),
                         ),
@@ -164,7 +173,7 @@ class _BuildSwiperState extends State<BuildSwiper> {
                             child: GestureDetector(
                               onTap: () {
                                 optionsTapped[index] = false;
-                                task.deleteTask(task.currentList[index]['title']);
+                                task.deleteTask(task.currentList[index]['title'],task.currentList[index]['date']);
                               },
                               child: Container(
                                 padding: EdgeInsets.all(5.0),
@@ -201,9 +210,11 @@ class _BuildSwiperState extends State<BuildSwiper> {
     });
   }
 
-  Widget getTime(int timeInMilliseconds, BuildContext context) {
+  Future<Widget> getTime(int timeInMilliseconds, BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int timeFormat=prefs.getInt('timeFormat');
     DateTime time = DateTime.fromMillisecondsSinceEpoch(timeInMilliseconds);
-    String formattedTime = " ${time.hour}:${time.minute} ";
+    String formattedTime = timeFormat==12?" ${TimeTo24().convert(time)['hour']}:${time.minute} ${TimeTo24().convert(time)['timeOfDay']} ":" ${time.hour}:${time.minute} ";
     return Text(formattedTime,
         style: Theme.of(context).textTheme.display1.copyWith(
             letterSpacing: 2,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:native_test/models/task_model.dart';
 import 'package:native_test/screens/Home.dart';
+import 'package:native_test/screens/login_screens/intro_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -241,6 +242,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future _createUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+    await prefs.setBool('googleSignIn', false);
     await prefs.setStringList(
         'User', ["${_username.trim()} ", ""]);
     await auth.createUserWithEmailAndPassword(
@@ -252,10 +254,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       userUpdateInfo.photoUrl="";
       user.user.updateProfile(userUpdateInfo);
       print("${user.user.displayName} created");
-      Provider.of<TaskModel>(context,listen: false).setGoogleSignIn(false);
       Navigator.of(context).push(PageRouteBuilder(
           pageBuilder: (BuildContext context, Animation animation,
-              Animation secondaryAnimation) => Home()));
+              Animation secondaryAnimation) => IntroScreen()));
     });
   }
 }

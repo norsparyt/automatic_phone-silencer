@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:native_test/models/task_model.dart';
+import 'package:native_test/screens/login_screens/intro_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -225,11 +226,11 @@ class _LoginScreenState extends State<LoginScreen> {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.clear();
           await prefs.setStringList('User', ["${user.user.displayName} ", ""]);
-          Provider.of<TaskModel>(context, listen: false).setGoogleSignIn(false);
+          await prefs.setBool("googleSignIn", false);
           Navigator.of(context).push(PageRouteBuilder(
               pageBuilder: (BuildContext context, Animation animation,
                       Animation secondaryAnimation) =>
-                  Home()));
+                  IntroScreen()));
         }
       });
   }

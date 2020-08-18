@@ -55,7 +55,7 @@ public class ReminderBroadcast extends BroadcastReceiver {
 
                 }
             } else
-                Toast.makeText(c, "ERROR: VOLUME FIXED FOR THIS DEVICE", Toast.LENGTH_LONG).show();//made a toast
+                Toast.makeText(c, "ERROR: VOLUME CONTROL IS FIXED FOR THIS DEVICE", Toast.LENGTH_LONG).show();//made a toast
         } else {
             Toast.makeText(c, "ERROR: NOT SUPPORTED ON DEVICES BELOW LOLLIPOP", Toast.LENGTH_SHORT).show();
         }//made a toast

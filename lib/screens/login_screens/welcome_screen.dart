@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:native_test/models/task_model.dart';
 import 'package:native_test/screens/Home.dart';
+import 'package:native_test/screens/login_screens/intro_screen.dart';
 import 'package:native_test/screens/login_screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,41 +22,43 @@ class WelcomeScreen extends StatelessWidget {
       statusBarIconBrightness: Brightness.dark,
       statusBarColor: Colors.white,
     ));
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Image.asset(
-              "lib/images/welcome_image.jpg",
-              height: MediaQuery.of(context).size.height * 0.5,
-              alignment: Alignment.topCenter,
-            ),
-            Container(
-                margin: EdgeInsets.only(
-                    left: 30.0, right: 20.0, top: 20.0, bottom: 20.0),
-                child: Text(
-                  "Hey, there",
-                  style: Theme.of(context).textTheme.headline,
-                )),
-            Container(
-                margin: EdgeInsets.only(
-                    left: 30.0, right: 30.0, top: 0.0, bottom: 20.0),
-                child: Text(
-                  "Distracted by your phone during work?\nWe are here to help.",
-                  style: Theme.of(context)
-                      .textTheme
-                      .display2
-                      .copyWith(fontSize: 17),
-                )),
-            Expanded(
-              child: Container(child: signOptions(context)),
-            ),
-          ],
+    return WillPopScope(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Image.asset(
+                "lib/images/welcome_image.jpg",
+                height: MediaQuery.of(context).size.height * 0.5,
+                alignment: Alignment.topCenter,
+              ),
+              Container(
+                  margin: EdgeInsets.only(
+                      left: 30.0, right: 20.0, top: 20.0, bottom: 20.0),
+                  child: Text(
+                    "Hey, there",
+                    style: Theme.of(context).textTheme.headline,
+                  )),
+              Container(
+                  margin: EdgeInsets.only(
+                      left: 30.0, right: 30.0, top: 0.0, bottom: 20.0),
+                  child: Text(
+                    "Distracted by your phone during work?\nWe are here to help.",
+                    style: Theme.of(context)
+                        .textTheme
+                        .display2
+                        .copyWith(fontSize: 17),
+                  )),
+              Expanded(
+                child: Container(child: signOptions(context)),
+              ),
+            ],
+          ),
         ),
-      ),
+      ), onWillPop: ()=>SystemNavigator.pop(),
     );
   }
 
@@ -89,13 +92,14 @@ class WelcomeScreen extends StatelessWidget {
                           await SharedPreferences.getInstance();
                       await prefs.setStringList(
                           'User', [user.displayName, user.photoUrl]);
+                      await prefs.setBool("googleSignIn", true);
                       Navigator.push(
                           context,
                           PageRouteBuilder(
                               pageBuilder: (BuildContext context,
                                       Animation animation,
                                       Animation secondaryAnimation) =>
-                                  Home()));
+                                  IntroScreen()));
                     }
                   }).catchError((e) => print(e));
                 },
@@ -237,7 +241,6 @@ class WelcomeScreen extends StatelessWidget {
     final FirebaseUser user =
         (await auth.signInWithCredential(credential)).user;
     print("signed in " + user.displayName);
-    Provider.of<TaskModel>(context, listen: false).setGoogleSignIn(true);
     return user;
   }
 }

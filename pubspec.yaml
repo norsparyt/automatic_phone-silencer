@@ -35,6 +35,7 @@ dependencies:
   google_sign_in: ^4.5.1
   google_sign_in_web: 0.9.1
   shared_preferences:
+  introduction_screen: ^1.0.9
 
 #  shared_preferences_linux: 0.0.2
 #  shared_preferences_macos: 0.0.1

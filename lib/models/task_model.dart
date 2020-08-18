@@ -4,6 +4,9 @@ import 'package:native_test/models/task.dart';
 
 class TaskModel extends ChangeNotifier {
   var db = new DatabaseHelper();
+  //to count today's tasks for intro line
+  int counter;
+
   List<dynamic> allTaskList = [];
 
   //list of database stored tasks
@@ -33,10 +36,6 @@ class TaskModel extends ChangeNotifier {
 
   DateTime initialDateField = DateTime.now();
 
-  bool googleSignIn = false;
-
-  setGoogleSignIn(bool value) => googleSignIn = value;
-
   //self-explanatory
   void initTaskList() {
     //called inside initState of Home screen
@@ -62,11 +61,13 @@ class TaskModel extends ChangeNotifier {
       print("Task list Initialised");
       //taskList is initialised
       setCurrentListFromAllTaskList(DateTime.now());
+      //today's task length
+      counter=currentList.length;
       //update the current list with today's tasks
       if (currentList.length > 0) {
         //if there are some tasks present set the intro line, home color, and dynamic color list accordingly
         print("greater than 0");
-        setIntroLine(currentList.length);
+        setIntroLine(counter);
         setHomeColor(Colors.grey.shade50);
         setDynamicColor(currentList[0]["category"]);
       }
@@ -113,12 +114,14 @@ class TaskModel extends ChangeNotifier {
     db.getAllTasks().then((list) {
       list.forEach((value) => print("$value \n"));
     });
-
+    if(DateTime.fromMillisecondsSinceEpoch(task.date).day==DateTime.now().day)
+      counter++;
+    setIntroLine(counter);
     notifyListeners();
     //Todo: we to rebuild the current task list every time by calling the set function
   }
 
-  void deleteTask(String title) async {
+  void deleteTask(String title, int date) async {
     //method to remove tasks from all 3 lists: database, allTasksList and conditionally currentList
     allTaskList.removeWhere((item) => item["title"] == title);
     //removing from all tasks list
@@ -130,13 +133,17 @@ class TaskModel extends ChangeNotifier {
     db.getAllTasks().then((list) {
       list.forEach((value) => print("$value \n"));
     });
+    if(DateTime.fromMillisecondsSinceEpoch(date).day==DateTime.now().day)
+      counter--;
+    if(counter==0)
+      introLine = "You haven't set any tasks for today";
+    else
+      setIntroLine(counter);
     //printing
     if (currentList.length == 0) {
-      introLine = "You haven't set any tasks for today";
       setDynamicColor("");
       setHomeColor(Colors.grey.shade900);
-    } else
-      setIntroLine(currentList.length);
+    }
     //changing dynamic ui for home screen elements
     notifyListeners();
   }
